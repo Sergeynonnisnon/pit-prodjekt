@@ -72,6 +72,7 @@ class DB (market_data):
         con.close()
         return (print(data))
 
+
 """class Tread(threading.Thread,market_data,DB):
 
     def __init__(self,  name, instruction,timer):
