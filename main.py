@@ -2,7 +2,8 @@
 from kuna_API.kunaAPI import *
 import sqlite3
 import threading
-from pandas.io.sql import read_sql
+from traceback import format_exc
+
 #
 # this is the bridge between ws kuna.io and MT4
 #implemented by collecting 1 minute data with public API kuna.io
@@ -87,10 +88,16 @@ class main(KunaAPI):
     def bd_writing(self):
 
         threading.Timer(1.0, self.bd_writing).start()
-        self.market_parse=self.market_data_main.market_data_pars()
+        try:
+            self.market_parse=self.market_data_main.market_data_pars()
+        except:
+            f = open("log.txt", "w")
+            f.write('Error parsing ' + str(time.thread_time()) + str(format_exc()))
+            print('Error parsing')
+            f.close()
 
         self.a.add(self.market_parse)
-        if self.market_parse[0] - self.servertick >= 10:
+        if self.market_parse[0] - self.servertick >= 60:
             threading.Timer(0.0, self.minutes_given).start()
 
 
@@ -101,14 +108,14 @@ class main(KunaAPI):
     def minutes_given(self):
 
         for i in sorted(self.a):
-            self.DB_main.writhing(i)
-
-        #threading.Timer(60.0, self.minutes_given).start()
+            try:
+                self.DB_main.writhing(i)
+            except :
+                f = open("log.txt","w")
+                f.write('Error writing '+str(time.thread_time())+str(format_exc()))
+                print ('Error writing')
+                f.close()
         print('time tread writing ', time.thread_time())
-
-
-
-
 
 
 if __name__ == '__main__':
