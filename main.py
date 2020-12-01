@@ -11,11 +11,11 @@ from traceback import format_exc
 
 
 kuna=KunaAPI()
-VALID_MARKET_DATA_PAIRS= VALID_MARKET_DATA_PAIRS[8]
+VALID_MARKET_DATA_PAIRS = VALID_MARKET_DATA_PAIRS[8]
 
 class market_data(KunaAPI):
     #currency ==VALID_MARKET_DATA_PAIRS[]
-    def __init__(self,currency):
+    def __init__(self, currency):
         self.kuna = KunaAPI()
         self.currency = currency
 
@@ -34,7 +34,7 @@ class market_data(KunaAPI):
 
 class DB (market_data):
     # currency ==VALID_MARKET_DATA_PAIRS[]
-    def __init__(self,market_data):
+    def __init__(self, market_data):
         self.market_data = market_data
         self.currency = market_data.currency
 
@@ -42,7 +42,9 @@ class DB (market_data):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
         cur.execute(
-            'CREATE TABLE IF NOT EXISTS ' +str(self.currency)+ ' (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
+            'CREATE TABLE IF NOT EXISTS ' +str(self.currency)+ ' (at PRIMARY KEY, buy TEXT,'
+                                                               'sell TEXT,low  TEXT,high TEXT,'
+                                                               'last TEXT,vol TEXT,price TEXT)')
         con.commit()
         cur.close()
         con.close()
