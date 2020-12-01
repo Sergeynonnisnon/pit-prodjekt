@@ -94,18 +94,20 @@ class main(KunaAPI):
         self.market_parse=self.market_data_main.market_data_pars()
 
         self.a.add(self.market_parse)
-        if self.market_parse[0] - self.servertick >= 60:
+        if self.market_parse[0] - self.servertick >= 10:
+            threading.Timer(0.0, self.minutes_given).start()
 
-            self.minutes_given()
-            print (self.a)
+
             self.servertick = self.market_parse[0]
-
+            self.a = set()
         print ("время выполнения потока 1", time.thread_time())
 
     def minutes_given(self):
         #TODO переписать на добавление в базу
-        self.market_parse = self.market_data_main.market_data_pars()
-        self.DB_main.writhing(self.market_data_main.market_data_pars())
+
+        for i in sorted(self.a):
+            self.DB_main.writhing(i)
+
         #threading.Timer(60.0, self.minutes_given).start()
         print("прошло 60 сек,запущен второй поток ", time.thread_time())
     #TODO запилить часовые и дневные базы и добавления в базу
