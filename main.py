@@ -6,6 +6,7 @@ import urllib
 import requests
 from kuna_API.kunaAPI import *
 import sqlite3
+import threading
 from pandas.io.sql import read_sql
 # программа выполняет функции моста между МТ 4 и API куны
 
@@ -14,61 +15,61 @@ from pandas.io.sql import read_sql
 #TODO настроить поток
 #TODO создать загрузку пакетов в файл поминутно для отправки
 #TODO создать возможность отправить по запросу *
+#kuna=KunaAPI()
+#print(kuna.get_recent_market_data('btcuah'))
+class market_data(KunaAPI):
+    def __init__(self,currency):
+        self.kuna = KunaAPI()
+        self.currency = currency
 
-class main(KunaAPI()):
+    def market_data_pars(self):
+        a = self.kuna.get_recent_market_data(self.currency)
+        at = a.get('at')
+        buy = a.get('ticker').get('buy')
+        sell = a.get('ticker').get('sell')
+        low = a.get('ticker').get('low')
+        high = a.get('ticker').get('high')
+        last = a.get('ticker').get('last')
+        vol = a.get('ticker').get('vol')
+        price = a.get('ticker').get('price')
+        return (at, buy, sell, low, high, last, vol, price)
+
+
+class DB (market_data):
+    def __init__(self,market_data_pars):
+        self.market_data_pars= market_data_pars
+    def create_db(self):
+        con = sqlite3.connect('test.db')
+        cur = con.cursor()
+        cur.execute(
+            'CREATE TABLE IF NOT EXISTS test (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
+        con.commit()
+        cur.close()
+        con.close()
+
+    def writhing(self):
+        con = sqlite3.connect('test.db')
+        cur = con.cursor()
+        cur.execute('INSERT INTO test VALUES (?,?,?,?,?,?,?,?)', self.market_data_pars('btcuah'))
+        con.commit()
+
+        cur.close()
+        con.close()
+
+    def reading(self):
+        con = sqlite3.connect('test.db')
+        cur = con.cursor()
+        cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM test ORDER BY at')
+        data = cur.fetchall()
+
+        cur.close()
+        con.close()
+        return (print(data))
+
+
+class main(KunaAPI):
     def __init__(self):
         kuna=KunaAPI()
-
-
-
-
-def market_data_pars(currency):
-    a = kuna.get_recent_market_data(currency)
-    at = a.get('at')
-    buy = a.get('ticker').get('buy')
-    sell = a.get('ticker').get('sell')
-    low = a.get('ticker').get('low')
-    high = a.get('ticker').get('high')
-    last = a.get('ticker').get('last')
-    vol = a.get('ticker').get('vol')
-    price = a.get('ticker').get('price')
-    return (at, buy, sell, low, high, last, vol, price)
-
-
-# create db
-def create_db():
-    con = sqlite3.connect('test.db')
-    cur = con.cursor()
-    cur.execute(
-        'CREATE TABLE IF NOT EXISTS test (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
-    con.commit()
-    cur.close()
-    con.close()
-
-
-create_db()
-
-
-def writhing():
-    con = sqlite3.connect('test.db')
-    cur = con.cursor()
-    cur.execute('INSERT INTO test VALUES (?,?,?,?,?,?,?,?)', market_data_pars('btcuah'))
-    con.commit()
-
-    cur.close()
-    con.close()
-
-
-def reading():
-    con = sqlite3.connect('test.db')
-    cur = con.cursor()
-    cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM test ORDER BY at')
-    data = cur.fetchall()
-
-    cur.close()
-    con.close()
-    return (print(data))
-
 
 #def main():
 #    threading.Timer(1.0, main).start()
