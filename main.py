@@ -15,9 +15,12 @@ from pandas.io.sql import read_sql
 #TODO настроить поток
 #TODO создать загрузку пакетов в файл поминутно для отправки
 #TODO создать возможность отправить по запросу *
-#kuna=KunaAPI()
+kuna=KunaAPI()
 #print(kuna.get_recent_market_data('btcuah'))
+VALID_MARKET_DATA_PAIRS= VALID_MARKET_DATA_PAIRS[8]
+
 class market_data(KunaAPI):
+    #currency ==VALID_MARKET_DATA_PAIRS[]
     def __init__(self,currency):
         self.kuna = KunaAPI()
         self.currency = currency
@@ -32,14 +35,18 @@ class market_data(KunaAPI):
         last = a.get('ticker').get('last')
         vol = a.get('ticker').get('vol')
         price = a.get('ticker').get('price')
-        return (at, buy, sell, low, high, last, vol, price)
-
+        result = (at, buy, sell, low, high, last, vol, price)
+        return result
+#print (market_data(VALID_MARKET_DATA_PAIRS[8]).market_data_pars())
 
 class DB (market_data):
-    def __init__(self,market_data_pars):
-        self.market_data_pars= market_data_pars
+    # currency ==VALID_MARKET_DATA_PAIRS[]
+    def __init__(self,market_data):
+        self.market_data = market_data
+        self.currency = market_data.currency
+
     def create_db(self):
-        con = sqlite3.connect('test.db')
+        con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
         cur.execute(
             'CREATE TABLE IF NOT EXISTS test (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
@@ -48,16 +55,16 @@ class DB (market_data):
         con.close()
 
     def writhing(self):
-        con = sqlite3.connect('test.db')
+        con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
-        cur.execute('INSERT INTO test VALUES (?,?,?,?,?,?,?,?)', self.market_data_pars('btcuah'))
+        cur.execute('INSERT INTO test VALUES (?,?,?,?,?,?,?,?)', self.market_data(self.currency))
         con.commit()
 
         cur.close()
         con.close()
 
     def reading(self):
-        con = sqlite3.connect('test.db')
+        con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
         cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM test ORDER BY at')
         data = cur.fetchall()
@@ -70,6 +77,16 @@ class DB (market_data):
 class main(KunaAPI):
     def __init__(self):
         kuna=KunaAPI()
+        market_data_main = market_data(VALID_MARKET_DATA_PAIRS)
+
+        DB_main= DB(market_data_main)
+        DB_main.create_db()
+
+        #threading.Timer(1.0, main).start()
+        market_data_main.market_data_pars()
+        DB_main.writhing()
+        print (time.thread_time())
+
 
 #def main():
 #    threading.Timer(1.0, main).start()
