@@ -3,14 +3,13 @@ from kuna_API.kunaAPI import *
 import sqlite3
 import threading
 from pandas.io.sql import read_sql
-# программа выполняет функции моста между МТ 4 и API куны
+#
+# this is the bridge between ws kuna.io and MT4
+#implemented by collecting 1 minute data with public API kuna.io
+# and pack him from bd based on mysql3
 
-#TODO обработать переменную at для математических исчислений
 
-#TODO создать загрузку пакетов в файл поминутно для отправки
-#TODO создать возможность отправить по запросу *
 kuna=KunaAPI()
-#print(kuna.get_recent_market_data('btcuah'))
 VALID_MARKET_DATA_PAIRS= VALID_MARKET_DATA_PAIRS[8]
 
 class market_data(KunaAPI):
@@ -79,17 +78,14 @@ class main(KunaAPI):
 
         self.DB_main = DB(self.market_data_main)
         self.DB_main.create_db()
-        #инициируем потоки
 
-
-        #print(self.market_data_main.market_data_pars[0])
         self.bd_writing()
 
 
 
 
     def bd_writing(self):
-        #TODO переписать в сет на 60 сек
+
         threading.Timer(1.0, self.bd_writing).start()
         self.market_parse=self.market_data_main.market_data_pars()
 
@@ -100,17 +96,15 @@ class main(KunaAPI):
 
             self.servertick = self.market_parse[0]
             self.a = set()
-        print ("время выполнения потока 1", time.thread_time())
+        print ("time tread parse ", time.thread_time())
 
     def minutes_given(self):
-        #TODO переписать на добавление в базу
 
         for i in sorted(self.a):
             self.DB_main.writhing(i)
 
         #threading.Timer(60.0, self.minutes_given).start()
-        print("прошло 60 сек,запущен второй поток ", time.thread_time())
-    #TODO запилить часовые и дневные базы и добавления в базу
+        print('time tread writing ', time.thread_time())
 
 
 
