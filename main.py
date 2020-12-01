@@ -88,10 +88,6 @@ class main(KunaAPI):
         print (time.thread_time())
 
 
-#def main():
-#    threading.Timer(1.0, main).start()
-#    print(kuna.get_recent_market_data('btcuah').get('at'))
-#    # reading()
-#    writhing()
+
 if __name__ == '__main__':
     main()
