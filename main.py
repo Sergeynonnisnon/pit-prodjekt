@@ -6,7 +6,7 @@ from pandas.io.sql import read_sql
 # программа выполняет функции моста между МТ 4 и API куны
 
 #TODO обработать переменную at для математических исчислений
-#TODO настроить поток
+
 #TODO создать загрузку пакетов в файл поминутно для отправки
 #TODO создать возможность отправить по запросу *
 kuna=KunaAPI()
@@ -71,19 +71,20 @@ class DB (market_data):
 
 class main(KunaAPI):
     def __init__(self):
-        kuna=KunaAPI()
-        self.servertick=kuna.get_server_time()
-        print (self.servertick)
+        kuna =KunaAPI()
+        self.a = set()
+        self.servertick = kuna.get_server_time()
+        print(self.servertick)
         self.market_data_main = market_data(VALID_MARKET_DATA_PAIRS)
 
-        self.DB_main= DB(self.market_data_main)
+        self.DB_main = DB(self.market_data_main)
         self.DB_main.create_db()
         #инициируем потоки
 
 
         #print(self.market_data_main.market_data_pars[0])
         self.bd_writing()
-        self.minutes_given()
+
 
 
 
@@ -91,16 +92,20 @@ class main(KunaAPI):
         #TODO переписать в сет на 60 сек
         threading.Timer(1.0, self.bd_writing).start()
         self.market_parse=self.market_data_main.market_data_pars()
-        self.DB_main.writhing(self.market_data_main.market_data_pars())
+
+        self.a.add(self.market_parse)
         if self.market_parse[0] - self.servertick >= 60:
 
             self.minutes_given()
-            print (self.servertick,self.market_parse[0])
+            print (self.a)
             self.servertick = self.market_parse[0]
 
         print ("время выполнения потока 1", time.thread_time())
+
     def minutes_given(self):
         #TODO переписать на добавление в базу
+        self.market_parse = self.market_data_main.market_data_pars()
+        self.DB_main.writhing(self.market_data_main.market_data_pars())
         #threading.Timer(60.0, self.minutes_given).start()
         print("прошло 60 сек,запущен второй поток ", time.thread_time())
     #TODO запилить часовые и дневные базы и добавления в базу
