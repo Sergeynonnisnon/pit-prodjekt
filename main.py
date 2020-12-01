@@ -49,15 +49,15 @@ class DB (market_data):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
         cur.execute(
-            'CREATE TABLE IF NOT EXISTS test (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
+            'CREATE TABLE IF NOT EXISTS ' +str(self.currency)+ ' (at PRIMARY KEY, buy TEXT,sell TEXT,low  TEXT,high TEXT,last TEXT,vol TEXT,price TEXT)')
         con.commit()
         cur.close()
         con.close()
 
-    def writhing(self):
+    def writhing(self,market_data_pars):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
-        cur.execute('INSERT INTO test VALUES (?,?,?,?,?,?,?,?)', self.market_data(self.currency))
+        cur.execute('INSERT INTO ' +str(self.currency)+ ' VALUES (?,?,?,?,?,?,?,?)', market_data_pars)
         con.commit()
 
         cur.close()
@@ -66,7 +66,7 @@ class DB (market_data):
     def reading(self):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
-        cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM test ORDER BY at')
+        cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM '+str(self.currency)+' ORDER BY at')
         data = cur.fetchall()
 
         cur.close()
@@ -84,7 +84,7 @@ class main(KunaAPI):
 
         #threading.Timer(1.0, main).start()
         market_data_main.market_data_pars()
-        DB_main.writhing()
+        DB_main.writhing(market_data_main.market_data_pars())
         print (time.thread_time())
 
 
