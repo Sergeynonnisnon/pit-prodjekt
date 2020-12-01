@@ -71,21 +71,49 @@ class DB (market_data):
         cur.close()
         con.close()
         return (print(data))
-class Tread(threading.Thread):
-    pass
+
+"""class Tread(threading.Thread,market_data,DB):
+
+    def __init__(self,  name, instruction,timer):
+        #Инициализация потока
+        Thread.__init__(self)
+        self.name = name
+        #self.instruction = instruction
+        self.timer = timer
+
+    def run(self):
+        threading.Timer(self.timer,main).start()
+        self.instruction
+        msg = "% добавлено %s!" % (self.name)
+        print(msg)"""
+
+
 
 class main(KunaAPI):
     def __init__(self):
         kuna=KunaAPI()
-        market_data_main = market_data(VALID_MARKET_DATA_PAIRS)
+        #self.tread= Tread()
+        self.market_data_main = market_data(VALID_MARKET_DATA_PAIRS)
 
-        DB_main= DB(market_data_main)
-        DB_main.create_db()
+        self.DB_main= DB(self.market_data_main)
+        self.DB_main.create_db()
+        #инициируем потоки
 
-            threading.Timer(2.0, main).start()
-            market_data_main.market_data_pars()
-            DB_main.writhing(market_data_main.market_data_pars())
-            print (time.thread_time())
+        self.bd_writing()
+        self.minutes_given()
+
+    def bd_writing(self):
+        threading.Timer(2.0, self.bd_writing).start()
+        self.market_parse=self.market_data_main.market_data_pars()
+        self.DB_main.writhing(self.market_data_main.market_data_pars())
+        print ("время выполнения потока 1", time.thread_time())
+    def minutes_given(self):
+        threading.Timer(60.0, self.testinger).start()
+        print("время выполнения потока 2 ", time.thread_time())
+
+
+
+
 
 
 
