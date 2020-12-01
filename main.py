@@ -37,7 +37,6 @@ class market_data(KunaAPI):
         price = a.get('ticker').get('price')
         result = (at, buy, sell, low, high, last, vol, price)
         return result
-#print (market_data(VALID_MARKET_DATA_PAIRS[8]).market_data_pars())
 
 class DB (market_data):
     # currency ==VALID_MARKET_DATA_PAIRS[]
