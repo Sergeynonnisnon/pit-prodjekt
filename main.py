@@ -82,7 +82,7 @@ class main(KunaAPI):
         DB_main= DB(market_data_main)
         DB_main.create_db()
 
-        #threading.Timer(1.0, main).start()
+        threading.Timer(2.0, main).start()
         market_data_main.market_data_pars()
         DB_main.writhing(market_data_main.market_data_pars())
         print (time.thread_time())
