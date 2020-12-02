@@ -5,12 +5,12 @@ import json
 import time, datetime
 import urllib
 import requests
-
+import os
 
 from urllib.parse import urlencode
 
-access_key = 'IdJP6GVRmPYmP3f6xKqYXXq6IckkVzvWmjSExWxl'
-secret_key = 'get you secret code here'
+access_key = os.environ.get('access_key')
+#secret_key = 'get you secret code here'
 
 API_VERSION = '2'
 KUNA_API_URL_PREFIX = 'api/v{}'.format(API_VERSION)
