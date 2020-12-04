@@ -6,6 +6,7 @@ import time, datetime
 import urllib
 import requests
 import os
+from traceback import format_exc
 
 from urllib.parse import urlencode
 try:
@@ -14,7 +15,7 @@ try:
 
 except:
     f = open("log.txt", "w")
-    f.write('Error key on ', time.ctime())
+    f.write('Error key on ' + str(time.ctime()) + str(format_exc()))
     print('ошибка ключа , проверьте заполненность переменыой access_key '
           '.получить ключи API можно зарегистрировавшись на сайте kuna.io ')
     f.close()

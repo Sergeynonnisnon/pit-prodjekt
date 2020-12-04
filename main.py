@@ -6,15 +6,19 @@ from traceback import format_exc
 
 #
 # this is the bridge between ws kuna.io and MT4
-#implemented by collecting 1 minute data with public API kuna.io
+# implemented by collecting 1 minute data with public API kuna.io
 # and pack him from bd based on mysql3
 
 
-kuna=KunaAPI()
+kuna = KunaAPI()
 VALID_MARKET_DATA_PAIRS = VALID_MARKET_DATA_PAIRS[8]
 
+
 class market_data(KunaAPI):
-    #currency ==VALID_MARKET_DATA_PAIRS[]
+    """ get market_data from kuna.io
+    currency ==VALID_MARKET_DATA_PAIRS[]
+    """
+
     def __init__(self, currency):
         self.kuna = KunaAPI()
         self.currency = currency
@@ -32,6 +36,7 @@ class market_data(KunaAPI):
         result = (at, buy, sell, low, high, last, vol, price)
         return result
 
+
 class DB (market_data):
     # currency ==VALID_MARKET_DATA_PAIRS[]
     def __init__(self, market_data):
@@ -42,17 +47,19 @@ class DB (market_data):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
         cur.execute(
-            'CREATE TABLE IF NOT EXISTS ' +str(self.currency)+ ' (at PRIMARY KEY, buy TEXT,'
-                                                               'sell TEXT,low  TEXT,high TEXT,'
-                                                               'last TEXT,vol TEXT,price TEXT)')
+            'CREATE TABLE IF NOT EXISTS '
+            + str(self.currency) +
+            ' (at PRIMARY KEY, buy TEXT,'
+            'sell TEXT,low  TEXT,high TEXT,'
+            'last TEXT,vol TEXT,price TEXT)')
         con.commit()
         cur.close()
         con.close()
 
-    def writhing(self,market_data_pars):
+    def writhing(self, market_data_pars):
         con = sqlite3.connect(self.currency+'.db')
         cur = con.cursor()
-        cur.execute('INSERT INTO ' +str(self.currency)+ ' VALUES (?,?,?,?,?,?,?,?)', market_data_pars)
+        cur.execute('INSERT INTO ' + str(self.currency) + ' VALUES (?,?,?,?,?,?,?,?)', market_data_pars)
         con.commit()
 
         cur.close()
@@ -66,14 +73,12 @@ class DB (market_data):
 
         cur.close()
         con.close()
-        return (print(data))
+        return data
 
 
-
-
-class main(KunaAPI):
+class main (KunaAPI):
     def __init__(self):
-        kuna =KunaAPI()
+        kuna = KunaAPI()
         self.a = set()
         self.servertick = kuna.get_server_time()
         print(self.servertick)
@@ -84,14 +89,11 @@ class main(KunaAPI):
 
         self.bd_writing()
 
-
-
-
     def bd_writing(self):
 
         threading.Timer(1.0, self.bd_writing).start()
         try:
-            self.market_parse=self.market_data_main.market_data_pars()
+            self.market_parse = self.market_data_main.market_data_pars()
         except:
             f = open("log.txt", "w")
             f.write('Error parsing ' + str(time.thread_time()) + str(format_exc()))
@@ -101,21 +103,19 @@ class main(KunaAPI):
         self.a.add(self.market_parse)
         if self.market_parse[0] - self.servertick >= 60:
             threading.Timer(0.0, self.minutes_given).start()
-
-
             self.servertick = self.market_parse[0]
             self.a = set()
-        print ("time tread parse ", time.thread_time())
+        print("time tread parse ", time.thread_time())
 
     def minutes_given(self):
 
         for i in sorted(self.a):
             try:
                 self.DB_main.writhing(i)
-            except :
-                f = open("log.txt","w")
+            except:
+                f = open("log.txt", "w")
                 f.write('Error writing '+str(time.thread_time())+str(format_exc()))
-                print ('Error writing')
+                print('Error writing')
                 f.close()
         print('time tread writing ', time.thread_time())
 
