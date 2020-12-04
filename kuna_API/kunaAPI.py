@@ -8,9 +8,16 @@ import requests
 import os
 
 from urllib.parse import urlencode
+try:
+    access_key = os.environ.get('access_key')
+    secret_key = 'get you secret code here'
 
-access_key = os.environ.get('access_key')
-#secret_key = 'get you secret code here'
+except:
+    f = open("log.txt", "w")
+    f.write('Error key on ', time.ctime())
+    print('ошибка ключа , проверьте заполненность переменыой access_key '
+          '.получить ключи API можно зарегистрировавшись на сайте kuna.io ')
+    f.close()
 
 API_VERSION = '2'
 KUNA_API_URL_PREFIX = 'api/v{}'.format(API_VERSION)
