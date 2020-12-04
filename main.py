@@ -112,7 +112,7 @@ class main (KunaAPI):
         for i in sorted(self.a):
             try:
                 self.DB_main.writhing(i)
-            except:
+            except sqlite3.IntegrityError:
                 f = open("log.txt", "w")
                 f.write('Error writing '+str(time.thread_time())+str(format_exc()))
                 print('Error writing')
