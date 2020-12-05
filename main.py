@@ -102,11 +102,11 @@ class main(KunaAPI):
             self.tread_start = tread_start(currency=i).start_parsing()
             try:
                 self.DB_main.writhing(self.tread_start)
-                print (time.thread_time())
+
             except Exception:
                 log_writing = open('log.txt', 'a')
                 log_writing.write(f'{i} {self.servertick} \n {format_exc()}')
-                print(f'{i} ошибка записи  в бд')
+                print(f'{i} error writing')
 
 
 if __name__ == '__main__':
