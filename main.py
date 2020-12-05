@@ -1,7 +1,7 @@
 from kuna_API.kunaAPI import *
 import sqlite3
 import threading
-from traceback import format_exc
+from traceback import format_exception_only
 
 #
 # this is the bridge between ws kuna.io and MT4
@@ -95,14 +95,17 @@ class main(KunaAPI):
             self.DB_main.create_db()
 
         threading.Timer(1.0, main).start()
+
         for i in MARKET_PAIRS_TO_GRYVNA:
             self.market_data_main = market_data(i)
             self.DB_main = DB(self.market_data_main)
             self.tread_start = tread_start(currency=i).start_parsing()
             try:
                 self.DB_main.writhing(self.tread_start)
-                print(f'{i} записано в бд')
-            except:
+                print (time.thread_time())
+            except Exception:
+                log_writing = open('log.txt', 'a')
+                log_writing.write(f'{i} {self.servertick} \n {format_exc()}')
                 print(f'{i} ошибка записи  в бд')
 
 
