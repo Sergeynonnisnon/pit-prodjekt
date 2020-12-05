@@ -15,9 +15,9 @@ try:
 
 except:
     f = open("log.txt", "w")
-    f.write('Error key on ' + str(time.ctime()) + str(format_exc()))
-    print('ошибка ключа , проверьте заполненность переменыой access_key '
-          '.получить ключи API можно зарегистрировавшись на сайте kuna.io ')
+    f.write('key error  on ' + str(time.ctime()) + str(format_exc()))
+    print('key error , check  access_key '
+          '.get key Kuna API on  personal  account on site kuna.io ')
     f.close()
 
 API_VERSION = '2'
