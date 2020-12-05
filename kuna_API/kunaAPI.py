@@ -24,10 +24,10 @@ API_VERSION = '2'
 KUNA_API_URL_PREFIX = 'api/v{}'.format(API_VERSION)
 KUNA_API_BASEURL = 'https://kuna.io/{}/'.format(KUNA_API_URL_PREFIX)
 
-MARKET_PAIRS_TO_GRYVNA = ['btcuah', 'ethuah', 'xrpuah', 'ltcuah', 'dashuah', 'bchuah', 'xlmuah', 'gbguah',
+MARKET_PAIRS_TO_GRYVNA = ['btcuah', 'ethuah', 'xrpuah', 'ltcuah', 'dashuah', 'bchuah', 'xlmuah',
                           'eosuah', 'usdtuah', 'wavesuah']
 
-VALID_MARKET_DATA_PAIRS = ['kunbtc', 'bchbtc', 'golgbg', 'rmcbtc', 'rbtc', 'evrbtc', 'foodbtc', 'hknbtc'] + \
+VALID_MARKET_DATA_PAIRS = [ 'rmcbtc', 'rbtc', 'evrbtc', 'foodbtc', 'hknbtc'] + \
                           MARKET_PAIRS_TO_GRYVNA
 
 
