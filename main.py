@@ -133,19 +133,23 @@ class main(KunaAPI):
             self.DB_main = DB(self.market_data_main)
             self.DB_main.create_db()
 
-        threading.Timer(1.0, main).start()
+        threading.Timer(0.9, main).start()
 
         for i in MARKET_PAIRS_TO_GRYVNA:
+
             self.market_data_main = market_data(i)
             self.DB_main = DB(self.market_data_main)
             self.tread_start = thread_start(currency=i).start_parsing()
+
             try:
+
                 self.DB_main.writhing(self.tread_start)
 
-            except Exception:
+
+            except sqlite3.IntegrityError:
                 log_writing = open('log.txt', 'a')
                 log_writing.write(f'{i} {self.server_tick} \n {format_exc()}')
-                print(f'{i} error writing')
+                print(f'{i} error get data')
 
 
 if __name__ == '__main__':
