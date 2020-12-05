@@ -10,7 +10,6 @@ from traceback import format_exc
 
 
 kuna = KunaAPI()
-#VALID_MARKET_DATA_PAIRS = VALID_MARKET_DATA_PAIRS[8]
 
 
 class market_data(KunaAPI):
@@ -80,16 +79,10 @@ class tread_start(KunaAPI):
     def __init__(self, currency=VALID_MARKET_DATA_PAIRS):
         self.pairs_currency = currency
 
-
     def start_parsing(self):
-
         self.market_data_main = market_data(self.pairs_currency).market_data_pars()
 
         return self.market_data_main
-
-
-
-
 
 
 class main(KunaAPI):
@@ -102,7 +95,7 @@ class main(KunaAPI):
             self.DB_main.create_db()
 
         threading.Timer(1.0, main).start()
-        for i in MARKET_PAIRS_TO_GRYVNA :
+        for i in MARKET_PAIRS_TO_GRYVNA:
             self.market_data_main = market_data(i)
             self.DB_main = DB(self.market_data_main)
             self.tread_start = tread_start(currency=i).start_parsing()
