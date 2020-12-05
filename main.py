@@ -14,34 +14,56 @@ kuna = KunaAPI()
 
 class market_data(KunaAPI):
     """ get market_data from kuna.io
-    currency ==VALID_MARKET_DATA_PAIRS[]
+
+    :return : result
     """
 
     def __init__(self, currency):
+        """
+
+        :param currency: pair currency from list
+        """
         self.kuna = KunaAPI()
         self.currency = currency
 
     def market_data_pars(self):
-        a = self.kuna.get_recent_market_data(self.currency)
-        at = a.get('at')
-        buy = a.get('ticker').get('buy')
-        sell = a.get('ticker').get('sell')
-        low = a.get('ticker').get('low')
-        high = a.get('ticker').get('high')
-        last = a.get('ticker').get('last')
-        vol = a.get('ticker').get('vol')
-        price = a.get('ticker').get('price')
+        """
+        get recent_market_data from API
+        :at: 'at'- ISO format time
+        :buy: demand buy
+        :sell: supply sell
+        :low: low price in 24 hour*
+        :high:high price in 24 hour*
+        :last: last deal price
+        :return: (str,str,str,str,str,str,str,str)
+        """
+        _get_data = self.kuna.get_recent_market_data(self.currency)
+        at = _get_data.get('at')
+        buy = _get_data.get('ticker').get('buy')
+        sell = _get_data.get('ticker').get('sell')
+        low = _get_data.get('ticker').get('low')
+        high = _get_data.get('ticker').get('high')
+        last = _get_data.get('ticker').get('last')
+        vol = _get_data.get('ticker').get('vol')
+        price = _get_data.get('ticker').get('price')
         result = (at, buy, sell, low, high, last, vol, price)
         return result
 
 
 class DB(market_data):
-    # currency ==VALID_MARKET_DATA_PAIRS[]
+    """
+    Use sql3 base
+    """
     def __init__(self, market_data):
         self.market_data = market_data
         self.currency = market_data.currency
 
     def create_db(self):
+        """
+        create sql3 DB
+        :currency: pairs currency
+        :return: None
+        """
         con = sqlite3.connect(self.currency + '.db')
         cur = con.cursor()
         cur.execute(
@@ -55,6 +77,11 @@ class DB(market_data):
         con.close()
 
     def writhing(self, market_data_pars):
+        """
+        writing result market_data_pars in DB
+        :param market_data_pars: (str,str,str..)
+        :return: None
+        """
         con = sqlite3.connect(self.currency + '.db')
         cur = con.cursor()
         cur.execute('INSERT INTO ' + str(self.currency) + ' VALUES (?,?,?,?,?,?,?,?)', market_data_pars)
@@ -64,6 +91,10 @@ class DB(market_data):
         con.close()
 
     def reading(self):
+        """
+        non use now but mb be needed
+        :return: data from BD
+        """
         con = sqlite3.connect(self.currency + '.db')
         cur = con.cursor()
         cur.execute('SELECT at,buy,sell,low,high,last,vol,price FROM ' + str(self.currency) + ' ORDER BY at')
@@ -74,7 +105,10 @@ class DB(market_data):
         return data
 
 
-class tread_start(KunaAPI):
+class thread_start(KunaAPI):
+    """
+    create structure a new thread
+    """
 
     def __init__(self, currency=VALID_MARKET_DATA_PAIRS):
         self.pairs_currency = currency
@@ -87,7 +121,12 @@ class tread_start(KunaAPI):
 
 class main(KunaAPI):
     def __init__(self):
-        self.servertick = kuna.get_server_time()
+        """
+        starting script
+        :server_tick: get time on kuna.io server to use on exception
+        Market_pairs_to_gryvna - list on KunaApi.py
+        """
+        self.server_tick = kuna.get_server_time()
 
         for i in MARKET_PAIRS_TO_GRYVNA:
             self.market_data_main = market_data(i)
@@ -99,13 +138,13 @@ class main(KunaAPI):
         for i in MARKET_PAIRS_TO_GRYVNA:
             self.market_data_main = market_data(i)
             self.DB_main = DB(self.market_data_main)
-            self.tread_start = tread_start(currency=i).start_parsing()
+            self.tread_start = thread_start(currency=i).start_parsing()
             try:
                 self.DB_main.writhing(self.tread_start)
 
             except Exception:
                 log_writing = open('log.txt', 'a')
-                log_writing.write(f'{i} {self.servertick} \n {format_exc()}')
+                log_writing.write(f'{i} {self.server_tick} \n {format_exc()}')
                 print(f'{i} error writing')
 
 
